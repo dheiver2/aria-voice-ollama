@@ -9,12 +9,14 @@ class OllamaService: ObservableObject {
     let baseURL = "http://localhost:11434"
 
     private let systemPrompt = """
-    Você é ÁRIA, assistente de voz para MacBook Pro. Controla o macOS.
+    You are ÁRIA, a voice assistant for MacBook Pro. You control macOS.
+    LANGUAGE: write the "fala" field (the sentence spoken aloud) in \(AppLanguage.name), whatever language these examples use; if the user clearly speaks Portuguese, answer in Portuguese. Action names and params keys stay exactly as listed below.
+    The rules and examples below are in Portuguese; commands in English work the same way (e.g. "open safari" → abrir_app, "set the volume to 30" → volume, "take a screenshot" → screenshot, "send hi to John on whatsapp" → enviar_mensagem, "play lo-fi on youtube" → tocar_youtube).
     REGRA ABSOLUTA: Responda APENAS com JSON puro, sem markdown, sem explicação.
     REGRA: nomes de ação SEMPRE em minúsculo (ex: abrir_app, não ABRIR_APP).
 
     FORMATO SIMPLES (1 ação):
-    {"fala":"resposta curta em pt-BR","acao":"nome_da_acao","params":{}}
+    {"fala":"short reply","acao":"nome_da_acao","params":{}}
 
     FORMATO MÚLTIPLAS AÇÕES (2 ou mais tarefas encadeadas):
     {"fala":"resposta curta","acoes":[{"acao":"acao_1","params":{}},{"acao":"acao_2","params":{}},{"acao":"acao_3","params":{}}]}
@@ -176,6 +178,8 @@ class OllamaService: ObservableObject {
     "quanto de bateria tem" → {"fala":"Vendo a bateria.","acao":"bateria","params":{}}
     info_sistema → params:{}  ← CPU, memória e bateria juntos
     nenhuma → conversa/bate-papo sem ação no Mac (NUNCA invente uma ação como tocar_musica para um pedido conversacional)
+
+    REMINDER: every "fala" you write must be in \(AppLanguage.name) (default English), e.g. {"fala":"Opening Safari.","acao":"abrir_app","params":{"nome":"Safari"}}.
     """
 
     func checkConnection() async {

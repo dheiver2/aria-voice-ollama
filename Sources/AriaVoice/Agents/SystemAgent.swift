@@ -19,7 +19,7 @@ final class SystemAgent {
         let script = on ? "set volume with output muted"
                        : "set volume without output muted"
         let r = osascript(script)
-        return r.isEmpty ? "✅ Mudo: \(on)" : "⚠️ \(r)"
+        return r.isEmpty ? "✅ Mute: \(on)" : "⚠️ \(r)"
     }
 
     func getVolume() -> Int {
@@ -36,7 +36,7 @@ final class SystemAgent {
         let b1 = shell("which brightness 2>/dev/null")
         if !b1.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             shell("brightness \(Double(v)/100.0)")
-            return "✅ Brilho: \(v)%"
+            return "✅ Brightness: \(v)%"
         }
         // Fallback: ddcctl ou teclas via osascript
         let script = """
@@ -45,7 +45,7 @@ final class SystemAgent {
         end tell
         """
         _ = osascript(script)
-        return "✅ Brilho ajustado (instale 'brightness' via Homebrew para controle preciso)"
+        return "✅ Brightness adjusted (install 'brightness' via Homebrew for precise control)"
     }
 
     // MARK: Screenshot
@@ -57,7 +57,7 @@ final class SystemAgent {
         let path = "\(desktop)/aria_\(ts).png"
         let flag = interactive ? "-i" : "-x"
         shell("/usr/sbin/screencapture \(flag) '\(path)'")
-        return "✅ Screenshot salvo: ~/Desktop/aria_\(ts).png"
+        return "✅ Screenshot saved: ~/Desktop/aria_\(ts).png"
     }
 
     // MARK: Notification
@@ -74,7 +74,7 @@ final class SystemAgent {
         let t = esc(title)
         let b = esc(body)
         let r = osascript("display notification \"\(b)\" with title \"\(t)\"")
-        return r.isEmpty ? "✅ Notificação enviada" : "⚠️ \(r)"
+        return r.isEmpty ? "✅ Notification sent" : "⚠️ \(r)"
     }
 
     // MARK: Battery / System Info
@@ -85,7 +85,7 @@ final class SystemAgent {
         let pct = lines.compactMap { l -> String? in
             guard let r = l.range(of: #"\d{1,3}%"#, options: .regularExpression) else { return nil }
             return String(l[r])
-        }.first ?? "indisponível"
+        }.first ?? "unavailable"
         return pct
     }
 
@@ -93,7 +93,7 @@ final class SystemAgent {
         let cpu  = shell("top -l 1 -s 0 | grep 'CPU usage' | awk '{print $3}' | tr -d '%'").trimmingCharacters(in: .whitespacesAndNewlines)
         let mem  = shell("memory_pressure | grep 'System-wide' | awk -F': ' '{print $2}'").trimmingCharacters(in: .whitespacesAndNewlines)
         let bat  = batteryInfo()
-        return "CPU: \(cpu)% | Memória: \(mem) | \(bat)"
+        return "CPU: \(cpu)% | Memory: \(mem) | \(bat)"
     }
 
     // MARK: Dark / Light Mode
@@ -108,7 +108,7 @@ final class SystemAgent {
         end tell
         """
         let r = osascript(script)
-        return r.isEmpty ? "✅ Modo escuro alternado" : "⚠️ \(r)"
+        return r.isEmpty ? "✅ Dark mode toggled" : "⚠️ \(r)"
     }
 
     // MARK: Do Not Disturb
@@ -118,7 +118,7 @@ final class SystemAgent {
         // macOS Ventura+
         let val = on ? "true" : "false"
         let r = shell("defaults -currentHost write com.apple.notificationcenterui doNotDisturb -bool \(val) && killall NotificationCenter 2>/dev/null; echo ok")
-        return r.contains("ok") ? "✅ Não Perturbe: \(on)" : "⚠️ Requer permissão"
+        return r.contains("ok") ? "✅ Do Not Disturb: \(on)" : "⚠️ Permission required"
     }
 
     // MARK: Sleep / Lock
@@ -126,12 +126,12 @@ final class SystemAgent {
     @discardableResult
     func lockScreen() -> String {
         shell("/System/Library/CoreServices/ScreenSaverEngine.app/Contents/MacOS/ScreenSaverEngine -background &")
-        return "✅ Tela bloqueada"
+        return "✅ Screen locked"
     }
 
     @discardableResult
     func sleep() -> String {
         shell("pmset sleepnow")
-        return "✅ Entrando em repouso"
+        return "✅ Going to sleep"
     }
 }

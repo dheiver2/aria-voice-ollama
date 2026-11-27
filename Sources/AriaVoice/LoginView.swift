@@ -32,12 +32,12 @@ struct LoginView: View {
                                                    startPoint: .leading, endPoint: .trailing))
 
                 VStack(spacing: 12) {
-                    TextField("Usuário", text: $username)
+                    TextField("Username", text: $username)
                         .textFieldStyle(.roundedBorder)
                         .autocorrectionDisabled(true)
                         .onSubmit(attemptLogin)
 
-                    SecureField("Senha", text: $password)
+                    SecureField("Password", text: $password)
                         .textFieldStyle(.roundedBorder)
                         .onSubmit(attemptLogin)
 
@@ -48,7 +48,7 @@ struct LoginView: View {
                     }
 
                     Button(action: attemptLogin) {
-                        Text("Entrar")
+                        Text("Sign in")
                             .font(.system(size: 14, weight: .semibold))
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 8)
@@ -69,7 +69,7 @@ struct LoginView: View {
             errorMessage = nil
             onSuccess()
         } else {
-            errorMessage = "Usuário ou senha incorretos"
+            errorMessage = "Incorrect username or password"
         }
     }
 }

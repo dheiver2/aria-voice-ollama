@@ -16,9 +16,9 @@ final class WebAgent {
     func openURL(_ raw: String) -> String {
         var str = raw.trimmingCharacters(in: .whitespaces)
         if !str.hasPrefix("http") { str = "https://" + str }
-        guard let url = URL(string: str) else { return "⚠️ URL inválida: \(raw)" }
+        guard let url = URL(string: str) else { return "⚠️ Invalid URL: \(raw)" }
         NSWorkspace.shared.open(url)
-        return "✅ Abrindo: \(str)"
+        return "✅ Opening: \(str)"
     }
 
     @discardableResult
@@ -35,7 +35,7 @@ final class WebAgent {
     @discardableResult
     func playYouTube(_ query: String) -> String {
         let clean = query.trimmingCharacters(in: .whitespaces)
-        guard !clean.isEmpty else { return "⚠️ Diga o que tocar no YouTube." }
+        guard !clean.isEmpty else { return "⚠️ Say what to play on YouTube." }
         let q = clean.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? clean
         let searchURL = "https://www.youtube.com/results?search_query=\(q)"
 
@@ -47,11 +47,11 @@ final class WebAgent {
             // ao player — senão o atalho cai numa página ainda em branco. Roda no
             // worker em background, não congela a UI.
             Thread.sleep(forTimeInterval: 2.2)
-            return "▶️ Tocando \"\(clean)\" no YouTube."
+            return "▶️ Playing \"\(clean)\" on YouTube."
         }
         // Fallback: não achou o vídeo → abre a busca p/ o usuário escolher
         if let url = URL(string: searchURL) { NSWorkspace.shared.open(url) }
-        return "🔎 Abri a busca de \"\(clean)\" no YouTube — diga \"dá play\" no vídeo escolhido."
+        return "🔎 Opened a YouTube search for \"\(clean)\" — say \"play\" on the video you pick."
     }
 
     /// Baixa o HTML da busca do YouTube e extrai o videoId do 1º resultado.

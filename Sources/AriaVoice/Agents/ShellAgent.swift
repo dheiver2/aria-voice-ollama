@@ -21,27 +21,27 @@ final class ShellAgent {
         // que contenham encadeamento/metacaracteres de shell.
         let metachars = CharacterSet(charactersIn: "|;&$`<>()\n\r")
         if trimmed.rangeOfCharacter(from: metachars) != nil {
-            return "⛔ Comando bloqueado por segurança: encadeamento/metacaracteres não permitidos"
+            return "⛔ Command blocked for security: chaining/metacharacters not allowed"
         }
 
         let base = trimmed.components(separatedBy: " ").first ?? ""
 
         guard allowed.contains(base) || trimmed.hasPrefix("open ") else {
-            return "⛔ Comando bloqueado por segurança: \(base)"
+            return "⛔ Command blocked for security: \(base)"
         }
 
         let out = shell(trimmed)
         let result = out.trimmingCharacters(in: .whitespacesAndNewlines)
-        return result.isEmpty ? "✅ Executado" : result
+        return result.isEmpty ? "✅ Done" : result
     }
 
     func createFolder(_ path: String) -> String {
         let expanded = (path as NSString).expandingTildeInPath
         do {
             try FileManager.default.createDirectory(atPath: expanded, withIntermediateDirectories: true)
-            return "✅ Pasta criada: \(path)"
+            return "✅ Folder created: \(path)"
         } catch {
-            return "⚠️ Erro: \(error.localizedDescription)"
+            return "⚠️ Error: \(error.localizedDescription)"
         }
     }
 }

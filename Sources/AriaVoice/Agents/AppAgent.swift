@@ -186,14 +186,14 @@ final class AppAgent {
     @discardableResult
     func open(_ rawName: String) -> String {
         let name = rawName.trimmingCharacters(in: .whitespaces)
-        guard !name.isEmpty else { return "⚠️ Nome do app não informado" }
+        guard !name.isEmpty else { return "⚠️ App name not provided" }
         let key = name.lowercased().replacingOccurrences(of: ".app", with: "")
         let bid = Self.bundleMap[key]
 
         // Fast-path: já está rodando → só ativa (workflow segue imediatamente)
         if Self.isRunning(named: name, bundle: bid) {
             activate(name: name, bundle: bid)
-            return "✅ \(name) já estava aberto"
+            return "✅ \(name) was already open"
         }
 
         var launched = false
@@ -246,9 +246,9 @@ final class AppAgent {
         let ready = waitUntil(timeoutMs: 4500, pollMs: 150) { Self.isRunning(named: name, bundle: bid) }
         if ready {
             activate(name: name, bundle: bid)
-            return "✅ Aberto: \(via)"
+            return "✅ Opened: \(via)"
         }
-        return launched ? "✅ Aberto: \(via)" : "⚠️ Não foi possível abrir \(name)"
+        return launched ? "✅ Opened: \(via)" : "⚠️ Could not open \(name)"
     }
 
     @discardableResult
@@ -257,7 +257,7 @@ final class AppAgent {
         let escapedName = name.replacingOccurrences(of: "\\", with: "\\\\")
                               .replacingOccurrences(of: "\"", with: "\\\"")
         let r = osascript("tell application \"\(escapedName)\" to quit")
-        return r.isEmpty ? "✅ Fechado: \(name)" : "⚠️ \(r)"
+        return r.isEmpty ? "✅ Closed: \(name)" : "⚠️ \(r)"
     }
 
     /// true se o nome corresponde a um app conhecido (bundle map) ou instalado (scan).

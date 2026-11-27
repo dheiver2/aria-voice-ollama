@@ -16,9 +16,19 @@ class SpeechOutput: NSObject, ObservableObject, AVSpeechSynthesizerDelegate {
 
     private func bestVoice() -> AVSpeechSynthesisVoice? {
         let all = AVSpeechSynthesisVoice.speechVoices()
-        let ptBR = all.filter { $0.language == "pt-BR" }
+        let ptBR = all.filter { $0.language == AppLanguage.localeID }
 
-        // Prioridade: Premium > Enhanced > Eloquence feminina > qualquer pt-BR
+        // Inglês (padrão): Premium > Enhanced > qualquer voz en-US (Samantha primeiro).
+        if !AppLanguage.isPT {
+            if let v = AVSpeechSynthesisVoice(identifier: "com.apple.voice.premium.en-US.Zoe")
+                ?? AVSpeechSynthesisVoice(identifier: "com.apple.voice.enhanced.en-US.Samantha")
+                ?? ptBR.first(where: { $0.quality == .premium })
+                ?? ptBR.first(where: { $0.quality == .enhanced })
+                ?? ptBR.first(where: { $0.name.contains("Samantha") }) { return v }
+            return ptBR.first ?? AVSpeechSynthesisVoice(language: "en-US")
+        }
+
+        // pt-BR: Premium > Enhanced > Eloquence feminina > qualquer pt-BR
         let priority = [
             "com.apple.voice.premium.pt-BR.Luciana",
             "com.apple.voice.enhanced.pt-BR.Luciana",
@@ -86,10 +96,10 @@ class SpeechOutput: NSObject, ObservableObject, AVSpeechSynthesizerDelegate {
         // Expande siglas comuns
         let expansions: [(String, String)] = [
             ("✅", ""), ("⚠️", ""), ("❌", ""), ("🧪", ""), ("💬", ""),
-            ("CPU:", "CPU:"), ("RAM:", "memória:"),
+            ("CPU:", "CPU:"), ("RAM:", AppLanguage.isPT ? "memória:" : "memory:"),
             ("KB", "kilobytes"), ("MB", "megabytes"), ("GB", "gigabytes"),
             ("https://", ""), ("http://", ""),
-            ("~/Desktop", "área de trabalho"),
+            ("~/Desktop", AppLanguage.isPT ? "área de trabalho" : "desktop"),
             ("~/Downloads", "downloads"),
         ]
         for (from, to) in expansions {
