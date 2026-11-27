@@ -8,7 +8,7 @@ class FloatingViewModel: ObservableObject {
     @Published var responseText        = ""
     @Published var audioLevel: Float   = 0
     @Published var modelName           = ""
-    @Published var hint                = "Toque na orbe para falar"
+    @Published var hint                = "Tap the orb to speak"
     @Published var historyVisible      = false
 
     private let voice   = VoiceManager()
@@ -71,7 +71,7 @@ class FloatingViewModel: ObservableObject {
     // MARK: - AI call with streaming
     private func sendToAI(_ text: String) async {
         guard ollama.isConnected else {
-            responseText = "Ollama offline. Inicie com: ollama serve"
+            responseText = "Ollama offline. Start it with: ollama serve"
             orbState = .idle
             return
         }
@@ -104,7 +104,7 @@ class FloatingViewModel: ObservableObject {
             waitForTTSThenClose()
 
         } catch {
-            responseText = "Erro ao conectar com Ollama."
+            responseText = "Failed to connect to Ollama."
             orbState = .idle
             scheduleClose(after: 4)
         }

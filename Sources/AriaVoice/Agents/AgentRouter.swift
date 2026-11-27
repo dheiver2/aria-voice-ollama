@@ -23,7 +23,7 @@ class AgentRouter: ObservableObject {
 
         // ── Modo multi-ação ────────────────────────────────────────────────
         if let acoes = json["acoes"] as? [[String: Any]], !acoes.isEmpty {
-            log("🔗 Multi-ação: \(acoes.count) tarefas")
+            log("🔗 Multi-action: \(acoes.count) tasks")
             var results: [String] = []
             var failures: [String] = []
             for (i, step) in acoes.enumerated() {
@@ -31,7 +31,7 @@ class AgentRouter: ObservableObject {
                 let params   = step["params"] as? [String: Any] ?? [:]
                 let critico  = (step["critico"]  as? Bool) ?? (step["critical"] as? Bool) ?? false
                 let opcional = (step["opcional"] as? Bool) ?? (step["optional"] as? Bool) ?? false
-                log("  [\(i+1)/\(acoes.count)] \(acao)\(critico ? " (crítico)" : "")")
+                log("  [\(i+1)/\(acoes.count)] \(acao)\(critico ? " (critical)" : "")")
                 // Respiro curto entre etapas. Ações que mudam estado (abrir app, tocar
                 // vídeo, enviar msg) JÁ esperam prontidão internamente (verify-and-wait),
                 // então 0.15s basta; ações instantâneas não pagam o antigo 0.4s. Não bloqueia a UI.
@@ -46,32 +46,32 @@ class AgentRouter: ObservableObject {
                 // Etapa CRÍTICA (pré-requisito) falhou → aborta o restante do workflow
                 if failed && critico {
                     let restantes = acoes.count - (i + 1)
-                    log("⛔ Etapa crítica \(i+1) falhou — abortando \(restantes) etapa(s)")
+                    log("⛔ Critical step \(i+1) failed — aborting \(restantes) step(s)")
                     lastAction = "parou na etapa \(i+1)/\(acoes.count)"
-                    lastResult = "⛔ Parou: etapa \(i+1) (\(acao)) era pré-requisito e falhou."
-                    return "Parei no passo \(i+1): \(acao) falhou e era necessário para o resto."
+                    lastResult = "⛔ Stopped: step \(i+1) (\(acao)) was a prerequisite and failed."
+                    return "I stopped at step \(i+1): \(acao) failed and was needed for the rest."
                 }
             }
             let summary = results.joined(separator: " | ")
-            log("✅ Multi resultado: \(summary)")
+            log("✅ Multi result: \(summary)")
 
             // Resultado AGREGADO das N etapas (não só a última) — o usuário precisa
             // saber QUANTAS e QUAIS falharam ao comandar várias tarefas por voz.
             let okCount = acoes.count - failures.count
-            lastAction = "\(acoes.count) tarefas"
+            lastAction = "\(acoes.count) tasks"
             lastResult = failures.isEmpty
-                ? "✅ \(okCount)/\(acoes.count) tarefas concluídas"
-                : "⚠️ \(okCount)/\(acoes.count) ok — falhou: \(failures.joined(separator: ", "))"
+                ? "✅ \(okCount)/\(acoes.count) tasks completed"
+                : "⚠️ \(okCount)/\(acoes.count) ok — failed: \(failures.joined(separator: ", "))"
 
             // Reconcilia a fala (prevista pelo LLM ANTES da execução) com o resultado real
             let anySuccess = results.contains {
-                !$0.hasPrefix("⚠️") && !$0.hasPrefix("⛔") && $0 != "💬 Conversa"
+                !$0.hasPrefix("⚠️") && !$0.hasPrefix("⛔") && $0 != "💬 Chat"
             }
             if !anySuccess {
-                return "Não consegui executar nenhuma das ações pedidas."
+                return "I could not run any of the requested actions."
             }
             if !failures.isEmpty {
-                return "\(fala) Mas \(failures.count) de \(acoes.count) tarefas falharam."
+                return "\(fala) But \(failures.count) of \(acoes.count) tasks failed."
             }
             return fala
         }
@@ -80,7 +80,7 @@ class AgentRouter: ObservableObject {
         let acao   = json["acao"]   as? String ?? json["comando"] as? String ?? "nenhuma"
         let params = json["params"] as? [String: Any] ?? json["parametros"] as? [String: Any] ?? [:]
 
-        log("🎯 Ação: \(acao) | Params: \(params)")
+        log("🎯 Action: \(acao) | Params: \(params)")
         lastAction = acao
 
         let result = await runOffMain(acao: acao.lowercased(), params: params)
@@ -153,13 +153,13 @@ class AgentRouter: ObservableObject {
 
         // ── System ────────────────────────────────────
         case "volume":
-            return valor >= 0 ? systemAgent.setVolume(valor) : "⚠️ Valor inválido"
+            return valor >= 0 ? systemAgent.setVolume(valor) : "⚠️ Invalid value"
 
         case "mudo", "mute":
             return systemAgent.mute(ativo)
 
         case "brilho", "brightness":
-            return valor >= 0 ? systemAgent.setBrightness(valor) : "⚠️ Valor inválido"
+            return valor >= 0 ? systemAgent.setBrightness(valor) : "⚠️ Invalid value"
 
         case "screenshot", "print", "captura":
             return systemAgent.screenshot()
@@ -260,7 +260,7 @@ class AgentRouter: ObservableObject {
             return "✅ Esperei \(s)s"
 
         case "nenhuma", "none", "":
-            return "💬 Conversa"
+            return "💬 Chat"
 
         default:
             // Só abre como app se a palavra realmente corresponder a um app instalado/conhecido.
@@ -270,7 +270,7 @@ class AgentRouter: ObservableObject {
                && appAgent.isKnownApp(candidato) {
                 return appAgent.open(candidato)
             }
-            return "⚠️ Ação desconhecida: \(acao)"
+            return "⚠️ Unknown action: \(acao)"
         }
     }
 
@@ -300,7 +300,7 @@ class AgentRouter: ObservableObject {
             return json
         }
 
-        log("⚠️ JSON inválido: \(jsonStr.prefix(100))")
+        log("⚠️ Invalid JSON: \(jsonStr.prefix(100))")
         return nil
     }
 

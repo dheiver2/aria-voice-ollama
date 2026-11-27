@@ -9,7 +9,7 @@ struct ContentView: View {
 
     @State private var messages: [ChatMessage] = []
     @State private var isProcessing = false
-    @State private var statusText   = "Toque no microfone para falar"
+    @State private var statusText   = "Tap the microphone to speak"
     @State private var showSettings = false
     @State private var showDebug    = false
     @State private var pulseScale: CGFloat = 1.0
@@ -135,7 +135,7 @@ struct ContentView: View {
                     .font(.system(size: 10, weight: .semibold, design: .monospaced))
                     .foregroundColor(accentL)
                 Spacer()
-                Button("Limpar") { router.debugLog.removeAll() }
+                Button("Clear") { router.debugLog.removeAll() }
                     .font(.system(size: 9)).foregroundColor(.white.opacity(0.3))
                     .buttonStyle(.plain)
             }
@@ -186,17 +186,17 @@ struct ContentView: View {
             Image(systemName: "waveform.circle.fill").font(.system(size: 60))
                 .foregroundStyle(LinearGradient(colors: [accent.opacity(0.6), accentL.opacity(0.3)],
                                                startPoint: .top, endPoint: .bottom))
-            Text("Olá! Sou a ÁRIA").font(.system(size: 20, weight: .semibold, design: .rounded))
+            Text("Hi! I'm ÁRIA").font(.system(size: 20, weight: .semibold, design: .rounded))
                 .foregroundColor(.white.opacity(0.8))
-            Text("Posso controlar seu Mac por voz.\nDiga um comando:")
+            Text("I can control your Mac by voice.\nSay a command:")
                 .font(.system(size: 13)).foregroundColor(.white.opacity(0.35))
                 .multilineTextAlignment(.center)
             VStack(alignment: .leading, spacing: 6) {
-                ForEach(["Abre o Safari",
-                         "Coloca o volume em 50",
-                         "Tira um screenshot",
-                         "Busca no Google por notícias",
-                         "Toca música"], id: \.self) { ex in
+                ForEach(["Open Safari",
+                         "Set the volume to 50",
+                         "Take a screenshot",
+                         "Search Google for news",
+                         "Play music"], id: \.self) { ex in
                     HStack(spacing: 8) {
                         Image(systemName: "mic.fill").font(.system(size: 10))
                             .foregroundColor(accent.opacity(0.7))
@@ -298,7 +298,7 @@ struct ContentView: View {
             Image(systemName: "trash").font(.system(size: 16))
                 .foregroundColor(.white.opacity(0.25))
                 .frame(width: 40, height: 40).background(.white.opacity(0.05)).clipShape(Circle())
-        }.buttonStyle(.plain).help("Limpar")
+        }.buttonStyle(.plain).help("Clear")
     }
 
     var stopButton: some View {
@@ -307,14 +307,14 @@ struct ContentView: View {
                 .font(.system(size: 16))
                 .foregroundColor(tts.isSpeaking ? accentL : .white.opacity(0.25))
                 .frame(width: 40, height: 40).background(.white.opacity(0.05)).clipShape(Circle())
-        }.buttonStyle(.plain).help("Parar fala")
+        }.buttonStyle(.plain).help("Stop speaking")
     }
 
     var settingsPanel: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("Configurações").font(.system(size: 14, weight: .semibold)).foregroundColor(.white)
+            Text("Settings").font(.system(size: 14, weight: .semibold)).foregroundColor(.white)
             VStack(alignment: .leading, spacing: 5) {
-                Text("Modelo Ollama").font(.system(size: 11)).foregroundColor(.white.opacity(0.5))
+                Text("Ollama model").font(.system(size: 11)).foregroundColor(.white.opacity(0.5))
                 Picker("", selection: $ollama.selectedModel) {
                     if ollama.availableModels.isEmpty {
                         Text(ollama.selectedModel).tag(ollama.selectedModel)
@@ -325,7 +325,7 @@ struct ContentView: View {
             }
             Divider().opacity(0.2)
             ForEach(["Safari", "WhatsApp", "Telegram", "Chrome"], id: \.self) { appName in
-                Button("Testar — \(appName)") {
+                Button("Test — \(appName)") {
                     showSettings = false
                     Task {
                         let r = appAgent().open(appName)
@@ -334,7 +334,7 @@ struct ContentView: View {
                     }
                 }.font(.system(size: 12)).foregroundColor(accentL).buttonStyle(.plain)
             }
-            Button("Verificar conexão") {
+            Button("Check connection") {
                 Task { await ollama.checkConnection() }
             }.font(.system(size: 12)).foregroundColor(accentL).buttonStyle(.plain)
         }
@@ -351,7 +351,7 @@ struct ContentView: View {
     private func handleMicTap() {
         if tts.isSpeaking { tts.stopSpeaking() }
         voice.toggleListening()
-        statusText = voice.isListening ? "Ouvindo... fale agora" : "Toque no microfone para falar"
+        statusText = voice.isListening ? "Listening... speak now" : "Tap the microphone to speak"
     }
 
     private func sendToAI(_ userText: String) async {
@@ -362,18 +362,18 @@ struct ContentView: View {
         guard !isProcessing else { return }
         messages.append(ChatMessage(role: "user", content: userText))
         isProcessing = true
-        statusText = "Pensando..."
+        statusText = "Thinking..."
 
         do {
             let rawLLM = try await ollama.chat(history: messages)
             let spoken = await router.process(rawLLM)
             messages.append(ChatMessage(role: "assistant", content: spoken))
             tts.speak(spoken)
-            statusText = "Toque no microfone para falar"
+            statusText = "Tap the microphone to speak"
         } catch {
             let msg = "Erro ao conectar com o Ollama."
             messages.append(ChatMessage(role: "assistant", content: msg, isError: true))
-            statusText = "Erro — verifique se o Ollama está rodando"
+            statusText = "Error — check that Ollama is running"
         }
         isProcessing = false
     }

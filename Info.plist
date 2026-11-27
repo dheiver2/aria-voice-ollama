@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>en</string>
     <key>CFBundleIdentifier</key>
     <string>com.dheiver.aria-voice</string>
     <key>CFBundleName</key>
@@ -25,13 +27,13 @@
     <key>LSMinimumSystemVersion</key>
     <string>13.0</string>
     <key>NSSpeechRecognitionUsageDescription</key>
-    <string>ÁRIA usa reconhecimento de voz para entender seus comandos em português.</string>
+    <string>ÁRIA uses speech recognition to understand your voice commands.</string>
     <key>NSMicrophoneUsageDescription</key>
-    <string>ÁRIA precisa do microfone para ouvir e interpretar seus comandos de voz.</string>
+    <string>ÁRIA needs the microphone to hear and interpret your voice commands.</string>
     <key>NSAppleEventsUsageDescription</key>
-    <string>ÁRIA usa Apple Events para controlar aplicativos do sistema.</string>
+    <string>ÁRIA uses Apple Events to control system applications.</string>
     <key>NSAccessibilityUsageDescription</key>
-    <string>ÁRIA usa Acessibilidade para enviar mensagens no WhatsApp e Telegram.</string>
+    <string>ÁRIA uses Accessibility to send messages in WhatsApp and Telegram.</string>
     <key>LSUIElement</key>
     <false/>
 </dict>

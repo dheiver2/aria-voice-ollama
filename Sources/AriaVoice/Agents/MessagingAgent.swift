@@ -16,7 +16,7 @@ final class MessagingAgent {
         } else if a.contains("telegram") || a.contains("tele") {
             return sendTelegram(contact: contact, message: message)
         }
-        return "⚠️ App '\(app)' não suportado para mensagens."
+        return "⚠️ App '\(app)' is not supported for messaging."
     }
 
     @discardableResult
@@ -34,7 +34,7 @@ final class MessagingAgent {
             let phone = contact.filter { $0.isNumber || $0 == "+" }
             if let url = URL(string: "whatsapp://send?phone=\(phone)&text=\(encode(message))") {
                 NSWorkspace.shared.open(url)
-                return "✅ Mensagem enviada para \(contact) no WhatsApp."
+                return "✅ Message sent to \(contact) on WhatsApp."
             }
         }
 
@@ -61,7 +61,7 @@ final class MessagingAgent {
                 Thread.sleep(forTimeInterval: 1.5)
                 // Depois de abrir o chat, digitar e enviar
                 typeAndSend(message)
-                return "✅ Mensagem enviada para \(contact) no Telegram."
+                return "✅ Message sent to \(contact) on Telegram."
             }
         }
 
@@ -80,7 +80,7 @@ final class MessagingAgent {
         // Abre o app
         let openResult = shell("/usr/bin/open -a \"\(appName)\" 2>&1")
         if openResult.lowercased().contains("unable") {
-            return "⚠️ Não foi possível abrir o \(appName)."
+            return "⚠️ Could not open \(appName)."
         }
         Thread.sleep(forTimeInterval: 1.2)
 
@@ -105,7 +105,7 @@ final class MessagingAgent {
         // Agora o campo de mensagem deve estar ativo — digita e envia
         typeAndSend(message)
 
-        return "✅ Mensagem enviada para \(contact) no \(appName)."
+        return "✅ Message sent to \(contact) on \(appName)."
     }
 
     // MARK: - Digitar e enviar (campo de mensagem já focado)
@@ -133,7 +133,7 @@ final class MessagingAgent {
         Thread.sleep(forTimeInterval: 1.8)
         AXEngine.pressEnter()
 
-        return "✅ Conversa com \(contact) aberta no \(appName)."
+        return "✅ Chat with \(contact) opened in \(appName)."
     }
 
     // MARK: - AppAgent direto via AX (para apps nativos)
@@ -141,26 +141,26 @@ final class MessagingAgent {
     /// Controla qualquer app nativo via AX: clica botões, preenche campos
     func clickButton(appName: String, buttonTitle: String) -> String {
         guard let axApp = AXEngine.axApp(named: appName) else {
-            return "⚠️ \(appName) não está rodando."
+            return "⚠️ \(appName) is not running."
         }
         guard let btn = AXEngine.findButton(in: axApp, named: buttonTitle) else {
-            return "⚠️ Botão '\(buttonTitle)' não encontrado em \(appName)."
+            return "⚠️ Button '\(buttonTitle)' not found in \(appName)."
         }
         _ = AXEngine.clickElement(btn)
-        return "✅ Clicado: \(buttonTitle) em \(appName)."
+        return "✅ Clicked: \(buttonTitle) in \(appName)."
     }
 
     func fillField(appName: String, placeholder: String, value: String) -> String {
         guard let axApp = AXEngine.axApp(named: appName) else {
-            return "⚠️ \(appName) não está rodando."
+            return "⚠️ \(appName) is not running."
         }
         if let field = AXEngine.find(axApp, role: "AXTextField", placeholder: placeholder) ??
                        AXEngine.find(axApp, role: "AXTextArea", placeholder: placeholder) {
             AXEngine.focus(field)
             AXEngine.pasteText(value, into: field)
-            return "✅ Campo '\(placeholder)' preenchido em \(appName)."
+            return "✅ Field '\(placeholder)' filled in \(appName)."
         }
-        return "⚠️ Campo '\(placeholder)' não encontrado em \(appName)."
+        return "⚠️ Field '\(placeholder)' not found in \(appName)."
     }
 
     // MARK: - Helpers

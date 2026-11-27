@@ -13,7 +13,7 @@ class VoiceManager: NSObject, ObservableObject {
 
     var onTranscriptionComplete: ((String) -> Void)?
 
-    private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "pt-BR"))
+    private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: AppLanguage.localeID))
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
     private var recognitionTask: SFSpeechRecognitionTask?
     private let audioEngine = AVAudioEngine()
@@ -58,7 +58,7 @@ class VoiceManager: NSObject, ObservableObject {
         let recogOK   = speechRecognizer?.isAvailable ?? false
         isAvailable   = micOK && speechOK && recogOK
         if micOK && speechOK && !recogOK {
-            transcribedText = "⚠️ Reconhecimento de voz pt-BR indisponível neste Mac. Verifique os idiomas de ditado em Ajustes do Sistema."
+            transcribedText = "⚠️ Speech recognition (\(AppLanguage.localeID)) is unavailable on this Mac. Check the dictation languages in System Settings."
         }
         print("[VoiceManager] mic=\(micOK) speech=\(speechOK) recognizer=\(recogOK) → available=\(isAvailable)")
     }
@@ -83,20 +83,20 @@ class VoiceManager: NSObject, ObservableObject {
         updateAvailability()
 
         if micPermission == .denied || micPermission == .restricted {
-            transcribedText = "⚠️ Microfone negado. Vá em Ajustes do Sistema > Privacidade > Microfone e permita ÁRIA."
+            transcribedText = "⚠️ Microphone access denied. Go to System Settings > Privacy > Microphone and allow ÁRIA."
             return
         }
         if permissionStatus == .denied || permissionStatus == .restricted {
-            transcribedText = "⚠️ Reconhecimento de voz negado. Vá em Ajustes do Sistema > Privacidade > Fala e permita ÁRIA."
+            transcribedText = "⚠️ Speech recognition denied. Go to System Settings > Privacy > Speech Recognition and allow ÁRIA."
             return
         }
         if micPermission == .notDetermined || permissionStatus == .notDetermined {
-            transcribedText = "⏳ Solicitando permissões... Aprove os diálogos do sistema."
+            transcribedText = "⏳ Requesting permissions... Approve the system dialogs."
             checkAndRequestPermissions()
             return
         }
         guard isAvailable else {
-            transcribedText = "⚠️ Permissões de microfone/voz indisponíveis. Verifique Ajustes do Sistema > Privacidade."
+            transcribedText = "⚠️ Microphone/speech permissions unavailable. Check System Settings > Privacy."
             return
         }
 
@@ -128,7 +128,7 @@ class VoiceManager: NSObject, ObservableObject {
                     // Código 203  = job cancelado
                     if code != 1110 && code != 203 {
                         print("[VoiceManager] Erro STT \(code): \(error.localizedDescription)")
-                        self.transcribedText = "⚠️ Erro de voz (\(code)): \(error.localizedDescription)"
+                        self.transcribedText = "⚠️ Speech error (\(code)): \(error.localizedDescription)"
                         self.lastTranscription = ""   // não despachar transcrição inválida em erro real
                     }
                     self.stopListening()
@@ -150,7 +150,7 @@ class VoiceManager: NSObject, ObservableObject {
         }
         guard format.sampleRate > 0, format.channelCount > 0 else {
             isListening = false
-            transcribedText = "⚠️ Microfone indisponível (formato de áudio inválido). Verifique o dispositivo de entrada."
+            transcribedText = "⚠️ Microphone unavailable (invalid audio format). Check the input device."
             recognitionTask?.cancel()
             recognitionTask = nil
             recognitionRequest = nil
@@ -165,10 +165,10 @@ class VoiceManager: NSObject, ObservableObject {
             audioEngine.prepare()
             try audioEngine.start()
             isListening = true
-            print("[VoiceManager] Gravação iniciada")
+            print("[VoiceManager] Recording started")
         } catch {
             isListening = false
-            transcribedText = "⚠️ Erro ao iniciar áudio: \(error.localizedDescription)"
+            transcribedText = "⚠️ Failed to start audio: \(error.localizedDescription)"
             print("[VoiceManager] Erro ao iniciar audioEngine: \(error)")
         }
     }
@@ -195,7 +195,7 @@ class VoiceManager: NSObject, ObservableObject {
             onTranscriptionComplete?(text)
             transcribedText = ""
         } else if !transcribedText.hasPrefix("⚠️") {
-            transcribedText = "Não entendi. Toque no microfone e fale novamente."
+            transcribedText = "I didn't catch that. Tap the microphone and speak again."
         }
     }
 

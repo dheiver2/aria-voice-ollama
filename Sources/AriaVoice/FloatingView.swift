@@ -153,10 +153,10 @@ struct FloatingView: View {
 
     private var stateHint: String {
         switch vm.orbState {
-        case .idle:       return "Toque para falar  •  ⌥Space"
-        case .listening:  return "Ouvindo... pare de falar para enviar"
-        case .processing: return "Processando com \(vm.modelName)..."
-        case .speaking:   return "Toque para parar"
+        case .idle:       return "Tap to speak  •  ⌥Space"
+        case .listening:  return "Listening... stop talking to send"
+        case .processing: return "Processing with \(vm.modelName)..."
+        case .speaking:   return "Tap to stop"
         }
     }
 }

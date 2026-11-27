@@ -57,23 +57,23 @@ final class MediaAgent {
     @discardableResult
     func controlVideo(_ cmd: String) -> String {
         guard let b = anyRunningBrowser() else {
-            return "⚠️ Nenhum navegador aberto para controlar o vídeo."
+            return "⚠️ No browser open to control the video."
         }
         switch cmd.lowercased() {
         case "play", "pause", "pausar", "tocar", "playpause", "play_pause", "toggle":
-            browserKey("k", browser: b); return "✅ Play/pause no vídeo (\(b))"
+            browserKey("k", browser: b); return "✅ Play/pause video (\(b))"
         case "mute", "mudo", "silenciar", "desmutar":
-            browserKey("m", browser: b); return "✅ Mudo no vídeo (\(b))"
+            browserKey("m", browser: b); return "✅ Mute video (\(b))"
         case "fullscreen", "tela_cheia", "telacheia", "cheia":
-            browserKey("f", browser: b); return "✅ Tela cheia (\(b))"
+            browserKey("f", browser: b); return "✅ Fullscreen (\(b))"
         case "avancar", "forward", "frente", "adiantar":
-            browserKey("l", browser: b); return "✅ Avançou 10s (\(b))"
+            browserKey("l", browser: b); return "✅ Skipped forward 10s (\(b))"
         case "voltar", "back", "retroceder", "atras":
-            browserKey("j", browser: b); return "✅ Voltou 10s (\(b))"
+            browserKey("j", browser: b); return "✅ Skipped back 10s (\(b))"
         case "proximo", "next", "proxima":
-            browserKey("n", shift: true, browser: b); return "✅ Próximo vídeo (\(b))"
+            browserKey("n", shift: true, browser: b); return "✅ Next video (\(b))"
         default:
-            browserKey("k", browser: b); return "✅ Play/pause no vídeo (\(b))"
+            browserKey("k", browser: b); return "✅ Play/pause video (\(b))"
         }
     }
 
@@ -83,21 +83,21 @@ final class MediaAgent {
         // o atalho "k" dá play/pause no player da web.
         if let b = frontmostBrowser() {
             browserKey("k", browser: b)
-            return "✅ Play no vídeo (\(b))"
+            return "✅ Play video (\(b))"
         }
         switch activeMedia() {
         case .spotify: osascript("tell application \"Spotify\" to play")
         case .music:   osascript("tell application \"Music\" to play")
         case .system:  osascript("tell application \"Music\" to play")
         }
-        return "✅ Reproduzindo"
+        return "✅ Playing"
     }
 
     @discardableResult
     func pause() -> String {
         if let b = frontmostBrowser() {
             browserKey("k", browser: b)
-            return "✅ Pausado (\(b))"
+            return "✅ Paused (\(b))"
         }
         switch activeMedia() {
         case .spotify: osascript("tell application \"Spotify\" to pause")
@@ -106,7 +106,7 @@ final class MediaAgent {
             // Sem app de música em foco: tenta o player do navegador, se houver
             if anyRunningBrowser() != nil { browserKey("k") }
         }
-        return "✅ Pausado"
+        return "✅ Paused"
     }
 
     @discardableResult
@@ -121,7 +121,7 @@ final class MediaAgent {
                 end tell
             """)
         }
-        return "✅ Próxima faixa"
+        return "✅ Next track"
     }
 
     @discardableResult
@@ -136,7 +136,7 @@ final class MediaAgent {
                 end tell
             """)
         }
-        return "✅ Faixa anterior"
+        return "✅ Previous track"
     }
 
     func nowPlaying() -> String {
@@ -148,7 +148,7 @@ final class MediaAgent {
             end tell
         """)
         if !r.isEmpty { return r }
-        return "Nenhuma mídia tocando"
+        return "Nothing playing"
     }
 
     @discardableResult
